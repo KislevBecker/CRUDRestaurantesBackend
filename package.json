@@ -1,0 +1,25 @@
+{
+  "name": "crudrestauranteskislevbecker",
+  "version": "1.0.0",
+  "description": "Crud de restaurantes con angular8 nodejs y express",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "postgresql",
+    "angular8"
+  ],
+  "author": "KislevBecker",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.6.4"
+  }
+}
