@@ -1,7 +1,7 @@
 module.exports = {
   HOST: "localhost",
   USER: "postgres",
-  PASSWORD: "123",
+  PASSWORD: "postgres",
   DB: "testdb",
   dialect: "postgres",
   pool: {
@@ -9,5 +9,6 @@ module.exports = {
     min: 0, //maximo de conexiones
     acquire: 30000, // maximo tiempo de espera antes de enviar error
     idle: 10000 // maximo tiempo de espera para la conexion de la db
-  }
+  },
+  logging:false
 };

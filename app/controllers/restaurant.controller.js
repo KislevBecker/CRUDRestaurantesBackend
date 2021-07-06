@@ -1,8 +1,7 @@
 const db = require("../models");
-const Restaurant = db.restaurantes;
+const Restaurant = db.restaurants;
 const Op = db.Sequelize.Op;
 
-//para paginar las búsquedas
 const getPagination = (page, size) => {
   const limit = size ? +size : 3;
   const offset = page ? page * limit : 0;
@@ -11,24 +10,26 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-  const { count: totalItems, rows: tutorials } = data;
+  const { count: totalItems, rows: restaurants } = data;
   const currentPage = page ? +page : 0;
   const totalPages = Math.ceil(totalItems / limit);
 
-  return { totalItems, tutorials, totalPages, currentPage };
+  return { totalItems, restaurants, totalPages, currentPage };
 };
 
-// crear y guardar nuevo restaurante
+// Crear y guardar restaurante
 exports.create = (req, res) => {
   // Validate request
+  debugger;
   if (!req.body.name) {
     res.status(400).send({
-      message: "No puede ser vacío!"
+      message: "El contenido no puede ser vacío!"
     });
     return;
   }
 
-  // Create restartante
+  // Crear el restaurante
+  debugger;
   const restaurant = {
     name: req.body.name,
     logo: req.body.logo,
@@ -39,7 +40,7 @@ exports.create = (req, res) => {
     published: req.body.published ? req.body.published : false
   };
 
-  // Save Tutorial in the database
+  // Guardar en ls db
   Restaurant.create(restaurant)
     .then(data => {
       res.send(data);
@@ -47,35 +48,32 @@ exports.create = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Hemos experimentado un error al momento de crear el restaurante."
+          err.message || "Hemos experimentado un error al guardar el restaurante."
       });
     });
 };
 
-// listar los restaurantes.
+// traer todos los rest de la bd.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-
   const { page, size, name } = req.query;
-  var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
+  var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
 
   const { limit, offset } = getPagination(page, size);
 
-
-  Restaurant.findAndCountAll({ where: condition, limit, offset })
+  Tutorial.findAndCountAll({ where: condition, limit, offset })
     .then(data => {
       const response = getPagingData(data, page, limit);
-      res.send(data);
+      res.send(response);
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Hemos experimentado un error al listar los restaurantes."
+          err.message || "Ha ocurrido un error y no se pudieron listar los restaurantes."
       });
     });
 };
 
-// buscar por id un restaurante
+// Find a single Tutorial with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
@@ -85,12 +83,12 @@ exports.findOne = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error trayendo el restaurante con id=" + id
+        message: "Error, no se encontró el restaurante con id=" + id
       });
     });
 };
 
-// actualizar restaurante pasando el id
+// actualizar un restaurante
 exports.update = (req, res) => {
   const id = req.params.id;
 
@@ -100,11 +98,11 @@ exports.update = (req, res) => {
     .then(num => {
       if (num == 1) {
         res.send({
-          message: "Restaurante exitosamente modificado."
+          message: "Restaurante actualizado exitosamente."
         });
       } else {
         res.send({
-          message: `No se pudo modificar el restaurante con id=${id}. Intente de nuevo!`
+          message: `No se pudo actualizar el restaurante con id=${id}. Intente de nuevo!`
         });
       }
     })
@@ -115,7 +113,7 @@ exports.update = (req, res) => {
     });
 };
 
-// borrar un restaurante pasando el id
+// Borrar un solo restaurante
 exports.delete = (req, res) => {
   const id = req.params.id;
 
@@ -125,48 +123,52 @@ exports.delete = (req, res) => {
     .then(num => {
       if (num == 1) {
         res.send({
-          message: "Restaurante eliminado correctamente!"
+          message: "Tutorial eliminado exitosamente!"
         });
       } else {
         res.send({
-          message: `No se pudo borrar el restaurante con id=${id}. Intente de nuevo!`
+          message: `No se pudo eliminar el restaurante con id=${id}. Intente de nuevo!`
         });
       }
     })
     .catch(err => {
       res.status(500).send({
-        message: "Error! no se puede borrar este restaurante con id=" + id
+        message: "Error al intentar eliminar el restaurante con id=" + id
       });
     });
 };
 
-// borrar todos los restaurantes
+// Borrar todos los restaurantes
 exports.deleteAll = (req, res) => {
-  Restaurant.destroy({
+  Tutorial.destroy({
     where: {},
     truncate: false
   })
     .then(nums => {
-      res.send({ message: `${nums} Restaurantes borrados exitosamente!` });
+      res.send({ message: `${nums} Restaurantes fueron eliminados exitosamente!` });
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Ocurrió un error mientras se intentaba eliminar todos los restaurantes."
+          err.message || "Ocurrió un error al momento de eliminar los restaurantes."
       });
     });
 };
 
-// buscar todos los restaurantes publicados
+// Listar todos los restaurantes
 exports.findAllPublished = (req, res) => {
+  const { page, size } = req.query;
+  const { limit, offset } = getPagination(page, size);
+
   Restaurant.findAndCountAll({ where: { published: true }, limit, offset })
     .then(data => {
-      res.send(data);
+      const response = getPagingData(data, page, limit);
+      res.send(response);
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Ocurrió un error al momento de listar todos los restaurantes."
+          err.message || "Ocurrió un error al listar los restaurantes."
       });
     });
 };
